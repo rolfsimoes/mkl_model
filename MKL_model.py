@@ -53,7 +53,7 @@ def configuracao_inicial():
    	#estoque[agente] = RD.lognormvariate(20.0, 1.0)
     global habilidade, recurso_ambiente, regeneracao_ambiente, estoque, recurso_ambiente_k, resiliencia, eficiencia
     habilidade = np.random.normal(3.0, 0.5, N) / 100
-    eficiencia = np.random.normal(0.5, 0.2, N) #introduz o efeito estocástico na busca por recursos
+    eficiencia = np.random.normal(0.5, 0.1, N) #introduz o efeito estocástico na busca por recursos
     recurso_ambiente = np.random.lognormal(4.0, 0.5, M) #+ 4
     recurso_ambiente_k = np.copy(recurso_ambiente)
     #resiliencia = recurso_ambiente * 0.25 #PRECISO aprender a definir a resiliência AQUI está dando pau nesta multiplicação
