@@ -2,16 +2,21 @@
 import random
 import pylab
 
-N_slaves = 5000 #Para visualizar bem a reta no log-log é preciso um valor grande
+N_slaves = 100 #Para visualizar bem a reta no log-log é preciso um valor grande
 p_connect = 1.0
-p_disconnect = 0.2
+p_disconnect = 0.3
 master_of = []
 bag_of_masters = []
-time_range = 100 #Isto deve ser bem maior para capturar o comportamento
+time_range = 10000 #Isto deve ser bem maior para capturar o comportamento
 
-def setup():
-    global master_of, bag_of_masters
+def setup(params):
+    global N_slaves, master_of, bag_of_masters, p_connect, p_disconnect, time_range
+    N_slaves = params["N"]
     master_of = [-1 for i in xrange(N_slaves)]
+    bag_of_masters = []
+    p_connect = params["connect_prob"]
+    p_disconnect = params["disconnect_prob"]
+    time_range = params["time_range"]
 
 def step():
     for slave in xrange(N_slaves):
@@ -44,12 +49,18 @@ def hist_masters_slave():
         hist_result[master_count[master]] += 1
     return hist_result
 
-def plot():
-    pylab.plot(hist_masters_slave(), ".g")
+def plot(label):
+    pylab.plot(hist_masters_slave(), "-o", label=label)
     pylab.yscale("log")
     pylab.xscale("log")
-    pylab.show()
 
-setup()
-run()
-plot()
+def experiment(params):
+    setup(params)
+    run()
+    plot("disconnect_prob: " + str(params["disconnect_prob"]))
+
+for i in xrange(0, 20, 2):
+    params = {"N": 1000, "time_range": 1000, "connect_prob":1.0, "disconnect_prob":0.02 * i}
+    experiment(params)
+pylab.legend()
+pylab.show()
