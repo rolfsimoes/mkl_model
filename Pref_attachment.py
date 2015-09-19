@@ -59,8 +59,10 @@ def experiment(params):
     run()
     plot("disconnect_prob: " + str(params["disconnect_prob"]))
 
-for i in xrange(0, 20, 2):
-    params = {"N": 1000, "time_range": 1000, "connect_prob":1.0, "disconnect_prob":0.02 * i}
+
+#######################################################EXPERIMENTS:
+for i in xrange(0, 20, 3):
+    params = {"N": 1000, "time_range": 1000, "connect_prob":1.0, "disconnect_prob":0.05 * i}
     experiment(params)
 pylab.legend()
 pylab.show()
