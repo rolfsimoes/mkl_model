@@ -1,78 +1,93 @@
-﻿import numpy
+﻿############
+## To-do list:
+##   * Comment code with 'docstring'.
+##   * Improve performance on choice routines (_take, _borrow, _migrate)
+##   * Create Power-law topology (Barabasi-Albert)
+##   * Create a 'save agregate data per simulation' for each class (Site, Debtlink, Agent, Simulation)
+##   * Create a 'save agregate data per step' for each class (Site, Debtlink, Agent, Simulation)
+##   * Create a plot graphs functions
+############
+
+import numpy
 
 class Site:
-	init_resource = 0.0
-	resource = 0.0
-	recovery_rate = 0.0
-	neighbors = []
-	agents = []
-	def __init__(self, **kwargs):
-		self.init_resource = numpy.random.lognormal(kwargs['resource_mean'], kwargs['resource_sigma'])
-		self.resource = numpy.copy(self.init_resource)
-		self.recovery_rate = numpy.random.lognormal(kwargs['recovery_mean'], kwargs['recovery_sigma'])
+	def __init__(self, 
+			     init_resource, 
+			     resource, 
+			     recovery_rate,
+			     predictability):
+		self.init_resource = init_resource
+		self.resource = resource
+		self.recovery_rate = recovery_rate
+		self.predictability = predictability
+		self.neighbors = []
 		self.neighbors.append(self)
+		self.agents_in_site = []
 	def add_agent(self, agent):
-		if not (agent in self.agents):
-			if agent.site != None:
-				agent.site.agents.remove(agent) 
-			self.agents.append(agent)
+		if not (agent in self.agents_in_site):
+			if (agent.site != None):
+				agent.site.agents_in_site.remove(agent) 
+			self.agents_in_site.append(agent)
 			agent.site = self
 	def recovery(self):
 		self.resource += self.recovery_rate * self.resource * (1.0 - self.resource / self.init_resource)
-	def _exploit(self, skill):
-		exploited_resource = min(self.resource, self.resource * skill)
-		self.resource -= exploited_resource
+		pass
+	def _exploit(self, agent_skill):
+		exploited_resource = 0.0
+		if numpy.random.rand() < self.predictability:
+			exploited_resource = min(self.resource, self.resource * agent_skill)
+			self.resource -= exploited_resource
 		return exploited_resource
+	def clear_neighbor(self):
+		self.neighbors.clear()
+		self.neighbors.append(self)
 
 class DebtLink:
-	lender = None
-	borrower = None
-	value = 0.0
-	def __init__(self, lender, borrower, value):
+	def __init__(self, 
+			     lender, 
+			     borrower, 
+			     value):
 		self.lender = lender
 		self.borrower = borrower
 		self.value = value
 
 class Agent:
-	agents = []
-	dying = False
-	skill = 0.0
-	stock = 0.0
-	stock_max = 0.0
-	consumption_demanded = 0.0
-	consumed = 0.0
-	consumption_deficit = 0.0
-	threshold_migrate = 0.0
-	threshold_debt = 0.0
-	threshold_death = 0.0
-	reproduction_prob = 0.0
-	inheritance = 0.0
-	strategy = 0
-	efficiency = 0.0
-	site = None
-	gift_gived = 0
-	debt = None
-	loans = []
-	def __init__(self, **kwargs):
-		self.agents_list = kwargs['agents_list']
-		self.dying = False
-		self.skill = kwargs['skill']
-		self.stock = kwargs['stock']
-		self.stock_max = kwargs['stock_max']
+	def __init__(self, 
+			     agents_list, 
+			     skill, 
+			     stock, 
+			     stock_max, 
+			     consumption_demanded, 
+			     reproduction_prob,
+			     inheritance, 
+			     strategy,
+			     site, 
+			     threshold_debt, 
+			     threshold_death,
+			     interest_rate):
+		self.agents_list = agents_list
+		self.skill = skill
+		self.stock = stock
+		self.stock_max = stock_max
+		self.consumption_demanded = consumption_demanded
 		self.consumed = 0.0
 		self.consumption_deficit = 0.0
-		self.threshold_migrate = kwargs['threshold_migrate']
-		self.threshold_debt = kwargs['threshold_debt']
-		self.threshold_death = kwargs['threshold_death']
-		self.reproduction_prob = kwargs['reproduction_prob']
-		self.inheritance = kwargs['inheritance']
-		self.strategy = kwargs['strategy']
-		self.efficiency = kwargs['efficiency']
-		kwargs['site'].add_agent(self)
+		self.reproduction_prob = reproduction_prob
+		self.inheritance = inheritance
+		self.strategy = strategy
+		self.site = None
+		site.add_agent(self)
+		self.threshold_debt = threshold_debt
+		self.threshold_death = threshold_death
+		self.interest_rate = interest_rate
+		self.gift_gived = 0
+		self.debt = None
+		self.loans = []
 	def produce(self):
+		"""Procedimento que realiza a producao do agente.
+		Sem valor de retorno."""
 		self.stock = min(self.stock, self.stock_max)
-		if numpy.random.rand() < self.efficiency: 
-			self.stock = site._exploit(self.skill)
+		self.stock += self.site._exploit(self.skill)
 	def consume(self):
 		self.consumed = min(self.stock, self.consumption_demanded)
 		self.stock -= self.consumed
@@ -81,19 +96,23 @@ class Agent:
 		self.consumption_deficit -= deficit_recovery
 		self.stock -= deficit_recovery
 	def solve_consumption_deficit(self):
-		if consumption_deficit > self.threshold_death: self._die()
-		elif (consumption_deficit > self.threshold_debt) and (self.stock == 0): 
+		if self.consumption_deficit > self.threshold_death: self._die()
+		elif (self.consumption_deficit > self.threshold_debt): 
 			self._borrow()
 			self._migrate()
-		elif (self.consumption_deficit > 0.0) and (self.stock == 0): 
+		elif (self.consumption_deficit > 0.0): 
 			self._take()
 			self._migrate()
 	def _take(self):
-		choosed = numpy.random.choice([a for s in self.site.neighbors for a in s.agents])
-		gift = choosed._give(self, self.consumption_demanded - self.consumed)
-		self.consumed += gift
-		self.consumption_deficit -= gift
-	def _give(self, taker, asked_value):
+		choice_list = [a for s in self.site.neighbors for a in s.agents_in_site if a != self]
+		if len(choice_list) > 0:
+			choosed = numpy.random.choice(choice_list)
+			gift = choosed._give(self, self.consumption_demanded - self.consumed)
+			self.consumed += gift
+			self.consumption_deficit -= gift
+	def _give(self, 
+		   taker, 
+		   asked_value):
 		if self.strategy == 0:
 			gift = min(self.stock, asked_value)
 			self.stock -= gift
@@ -101,115 +120,220 @@ class Agent:
 			return gift
 		else: return 0.0
 	def _migrate(self):
-		choosed = numpy.random.choice([s for s in self.neighbors])
-		if choosed.resource > self.site.resource:
-			choosed.add_agent(self)
+		choice_list = [s for s in self.site.neighbors if s != self.site]
+		if len(choice_list) > 0: 
+			choosed = numpy.random.choice(choice_list)
+			if choosed.resource > self.site.resource:
+				choosed.add_agent(self)
 	def _borrow(self):
-		if debt == None:
-			choosed = numpy.random.choice([a for s in self.site.neighbors for a in s.agents])
-			debt = choosed._lend(self, self.consumption_demanded - self.consumed)
-			self.consumed += debt
-			self.consumption_deficit -= debt
-	def _lend(self, borrower, asked_value):
+		if self.debt == None:
+			choice_list = [a for s in self.site.neighbors for a in s.agents_in_site if a.stock >= (self.consumption_demanded - self.consumed)]
+			if len(choice_list) > 0: 
+				choosed = numpy.random.choice(choice_list)
+				loan_value = choosed._lend(self, self.consumption_demanded - self.consumed)
+				self.consumed += loan_value
+				self.consumption_deficit -= loan_value
+	def _lend(self, 
+		   borrower, 
+		   asked_value):
 		if self.strategy == 1:
-			loan = min(self.stock, asked_value)
-			self.stock -= loan
-			debt = DebtLink(self, borrower, loan)
+			loan_value = min(self.stock, asked_value)
+			self.stock -= loan_value
+			debt = DebtLink(self, borrower, loan_value)
 			self.loans.append(debt)
 			borrower.debt = debt
-			return loan
+			return loan_value
 		else: return 0.0
-	def _die():
-		self.dying = True
-		self.site.agents.remove(self)
+	def _die(self):
+		self.site.agents_in_site.remove(self)
 		self.site = None
 		if self.debt != None:
 			self.debt.lender.loans.remove(self.debt)
 			self.debt = None
-		for loan in agent.loans:
+		for l, loan in enumerate(self.loans):
 			loan.borrower.debt = None
-			del loan
+			del self.loans[l]
+		self.agents_list.remove(self)
 	def charge(self):
-		for loan in loans:
-			payment = loan.borrower._pay(loan.value)
-			loan.value -= payment
-			if loan.value == 0.0:
+		for l, loan in enumerate(self.loans):
+			payment_value = loan.borrower._pay(loan.value * (1.0 + self.interest_rate))
+			loan.value -= payment_value
+			if loan.value <= 0.0:
 				loan.borrower.debt = None
-				del loan
-			self.stock += payment
+				del self.loans[l]
+			self.stock += payment_value
 	def _pay(self, asked_value):
-		payment = min(self.stock, asked_value)
-		self.stock -= payment
-		return payment
+		payment_value = min(self.stock, asked_value)
+		self.stock -= payment_value
+		return payment_value
 	def sprout(self):
 		if numpy.random.rand() < self.reproduction_prob: 
-			agent_parameters = {}
-			agent_parameters['agents_list'] = self.agents_list
-			agent_parameters['skill'] = numpy.random.normal(self.skill, 0.1)
-			agent_parameters['stock'] = self.stock * self.inheritance
-			self.stock -= agent_paramenters['stock']
-			agent_parameters['stock_max'] = self.stock_max
-			agent_parameters['consumption_demanded'] = numpy.random.normal(self.consumption_demanded, 0.1)
-			agent_parameters['reproduction_prob'] = self.reproduction_prob
-			agent_parameters['inheritance'] = self.inheritance
-			agent_parameters['strategy'] = self.strategy
-			agent_parameters['efficiency'] = numpy.random.normal(self.efficiency, 0.1)
-			agent_parameters['site'] = self.sites
-			agent_parameters['threshold_migrate'] = self.threshold_migrate
-			agent_parameters['threshold_debt'] = self.threshold_debt
-			agent_parameters['threshold_death'] = self.threshold_death
-			agents.append(Agent(agent_parameters))
+			sprout_agents_list = self.agents_list
+			sprout_skill = self.skill
+			sprout_stock = self.stock * self.inheritance
+			self.stock -= sprout_stock
+			sprout_stock_max = self.stock_max
+			sprout_consumption_demanded = self.consumption_demanded
+			sprout_reproduction_prob = self.reproduction_prob
+			sprout_inheritance = self.inheritance
+			sprout_strategy = self.strategy
+			sprout_site = self.site
+			sprout_threshold_debt = self.threshold_debt
+			sprout_threshold_death = self.threshold_death
+			sprout_interest_rate = self.interest_rate
+			self.agents_list.append(Agent(sprout_agents_list, 
+										  sprout_skill, 
+										  sprout_stock, 
+										  sprout_stock_max, 
+										  sprout_consumption_demanded, 
+										  sprout_reproduction_prob,
+										  sprout_inheritance, 
+										  sprout_strategy,
+										  sprout_site, 
+										  sprout_threshold_debt, 
+										  sprout_threshold_death,
+										  sprout_interest_rate))
 
-def topology(sites, height, width):
-	for i in range(height):
-		for j in range(width):
-			pass
+class Simulation():
+	def __init__(self, 
+			     sites_count, 
+			     sites_init_resource_mean, 
+			     sites_init_resource_sigma, 
+			     sites_recovery_rate_mean, 
+			     sites_recovery_rate_sigma, 
+			     sites_predictability_mean, 
+			     sites_predictability_sigma,
+			     agents_count,
+			     agents_skill_mean,
+			     agents_skill_sigma,
+			     agents_stock_max,
+			     agents_consumption_demanded_mean,
+			     agents_consumption_demanded_sigma,
+			     agents_reproduction_prob,
+			     agents_inheritance,
+			     agents_interest_rate):
+		site_parameters = {}
+		self.sites = []
+		for i in range(sites_count):
+			sites_init_resource = abs(numpy.random.normal(sites_init_resource_mean, sites_init_resource_sigma))
+			sites_resource = sites_init_resource
+			sites_recovery_rate = abs(numpy.random.normal(sites_recovery_rate_mean, sites_recovery_rate_sigma))
+			sites_predictability = abs(numpy.random.normal(sites_predictability_mean, sites_predictability_sigma))
+			self.sites.append(Site(sites_init_resource, 
+								   sites_resource, 
+								   sites_recovery_rate,
+								   sites_predictability))
+		self.agents_list = []
+		agent_parameters = {}
+		for i in range(agents_count):
+			agents_list = self.agents_list
+			agents_skill = abs(numpy.random.normal(agents_skill_mean, agents_skill_sigma))
+			agents_stock = 0.0
+			agents_stock_max = agents_stock_max
+			agents_consumption_demanded = abs(numpy.random.normal(agents_consumption_demanded_mean, agents_consumption_demanded_sigma))
+			agents_reproduction_prob = agents_reproduction_prob
+			agents_inheritance = agents_inheritance
+			agents_strategy = numpy.random.randint(0, 2)
+			agents_site = numpy.random.choice(self.sites)
+			agents_threshold_debt = 5.0 * agents_consumption_demanded
+			agents_threshold_death = 10.0 * agents_consumption_demanded
+			agents_interest_rate = agents_interest_rate
+			self.agents_list.append(Agent(agents_list, 
+										  agents_skill, 
+										  agents_stock, 
+										  agents_stock_max, 
+										  agents_consumption_demanded, 
+										  agents_reproduction_prob,
+										  agents_inheritance, 
+										  agents_strategy,
+										  agents_site, 
+										  agents_threshold_debt, 
+										  agents_threshold_death,
+										  agents_interest_rate))
+	def topology_grid(self, width, height):
+		for s in self.sites:
+			s.clear_neighbor()
+		for i in range(len(self.sites)):
+			if (i % width) + 1 < width:
+				self.sites[i].neighbors.append(self.sites[i + 1])
+				self.sites[i + 1].neighbors.append(self.sites[i])
+			if int(i / width) + 1 < height:
+				self.sites[i].neighbors.append(self.sites[i + width])
+				self.sites[i + width].neighbors.append(self.sites[i])
+	def topology_circle(self, radius):
+		for s in self.sites:
+			s.clear_neighbor()
+		for i in range(len(self.sites)):
+			for r in range(radius):
+				self.sites[i].neighbors.append(self.sites[(i + r + 1) % len(self.sites)])
+				self.sites[(i + r + 1) % len(self.sites)].neighbors.append(self.sites[i])
+	def topology_complete(self):
+		for i in range(len(self.sites) - 1):
+			for j in range(i + 1, len(self.sites)):
+				self.sites[i].neighbors.append(self.sites[j])
+				self.sites[j].neighbors.append(self.sites[i])
+	def topology_random_connect(self, probability):
+		for i in range(len(self.sites) - 1):
+			for j in range(i + 1, len(self.sites)):
+				if not (self.sites[j] in self.sites[i].neighbors):
+					if numpy.random.rand() < probability:
+						self.sites[i].neighbors.append(self.sites[j])
+						self.sites[j].neighbors.append(self.sites[i])
+	def topology_random_reconnect(self, probability):
+		for i in range(len(self.sites)):
+			for j in range(len(self.sites)):
+				if (i != j) and (self.sites[j] in self.sites[i].neighbors):
+					if numpy.random.rand() < probability / 2.0:
+						choice_list = [s for s in self.sites if not (s in self.sites[i].neighbors)]
+						if len(choice_list) > 0:
+							choosed = numpy.random.choice(choice_list)
+							self.sites[i].neighbors.remove(self.sites[j])
+							self.sites[j].neighbors.remove(self.sites[i])
+							self.sites[i].neighbors.append(choosed)
+							choosed.neighbors.append(self.sites[i])
+	def step(self):
+		numpy.random.shuffle(self.agents_list)
+		for agent in self.agents_list:
+			agent.produce()
+		for agent in self.agents_list:
+			agent.charge()
+		for agent in self.agents_list:
+			agent.consume()
+		for agent in self.agents_list:
+			agent.solve_consumption_deficit()
+		for site in self.sites:
+			site.recovery()
+		for agent in self.agents_list:
+			agent.sprout()
+	def simulation(self, max_time):
+		for t in range(max_time):
+			self.step()
+			print(t, len(self.agents_list), sum([a.gift_gived for a in self.agents_list]), len([l for a in self.agents_list for l in a.loans ]))
+		self.save_data()
+	def save_data(self):
+		pass
+		pass
 
-def setup():
-	global width, height, sites, N
-	width = 20
-	height = 20
-	site_parameters = { resource_mean: 4.0, resource_sigma: 0.3, recovery_mean: 1.0, recovery_sigma: 0.1 }
-	sites = [ Site(site_parameters) for i in range(height * width) ]
-	topology(sites, height, width)
+sim = Simulation(sites_count=1024, 
+			     sites_init_resource_mean = 4.0,
+			     sites_init_resource_sigma = 0.1,
+			     sites_recovery_rate_mean = 1.1,
+			     sites_recovery_rate_sigma = 0.1,
+			     sites_predictability_mean = 0.8,
+			     sites_predictability_sigma = 0.1,
+			     agents_count=200,
+			     agents_skill_mean = 0.2,
+			     agents_skill_sigma = 0.01,
+			     agents_stock_max = 0.0,
+			     agents_consumption_demanded_mean = 0.8,
+			     agents_consumption_demanded_sigma = 0.1,
+			     agents_reproduction_prob = 0.01,
+			     agents_inheritance = 0.1,
+			     agents_interest_rate = 0.1)
 
-	N = 100
-	agents_list = []
-	agent_parameters = {}
-	agent_parameters['agents_list'] = agents_list
-	agent_parameters['skill'] = numpy.random.lognormal(4.0, 0.1)
-	agent_parameters['stock'] = 0.0
-	agent_parameters['stock_max'] = 0.0
-	agent_parameters['consumption_demanded'] = numpy.random.lognormal(2.0, 0.2)
-	agent_parameters['strategy'] = numpy.random.randint(0, 2)
-	agent_parameters['efficiency'] = numpy.random.lognormal(0.1, 0.5)
-	agent_parameters['site'] = numpy.random.choice(sites)
-	agent_parameters['threshold_migrate'] = 2.0 * agent_parameters['consumption_demanded']
-	agent_parameters['threshold_debt'] = 5.0 * agent_parameters['consumption_demanded']
-	agent_parameters['threshold_death'] = 10.0 * agent_parameters['consumption_demanded']
-	for i in range(N):
-		agents_list.append(Agent(agent_parameters))
-
-def step():
-	numpy.random.shuffle(agents)
-	for agent in agents:
-		agent.produce()
-	for agent in agents:
-		agent.charge()
-	for agent in agents:
-		agent.consume()
-	for agent in agents:
-		agent.solve_consumption_deficit()
-	for dead_agent in agents:
-		if dead_agent.dying: del dead_agent
-	for site in sites:
-		site.recovery()
-
-def simulation(max_time):
-	setup()
-	for t in max_time:
-		step()
-	save_data()
-
-def save_data():
-	pass
+#sim.topology_grid(width=32, height=32)
+#sim.topology_circle(radius=2)
+#sim.topology_random_reconnect(0.02)
+sim.topology_random_connect(probability=0.05)
+#sim.topology_complete()
+sim.simulation(1000)
