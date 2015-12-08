@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1c0dbae4-5470-4d65-99e7-2c413c39458a}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>inequality_model.py</StartupFile>
+    <StartupFile>experiments.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -22,14 +22,10 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="figure_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="experiments.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="inequality_model.py" />
-    <Compile Include="Pref_attachment.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />

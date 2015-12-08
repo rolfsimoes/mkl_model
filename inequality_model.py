@@ -113,7 +113,7 @@ class Site:
 		self.resource += self.recovery_rate * self.resource * (1.0 - self.resource / self.init_resource)
 		pass
 	
-	def _exploit(self, agent_skill): # adicionei o "agent" aqui na funcao(). Precisa ter esse "agent_skill" aqui?
+	def _exploit(self, agent_skill):
 		"""
 		a funcao _exploit eh chamada por um objeto do tipo agent e interage com o 
 		objeto do tipo self, um site, um agente do tipo ambiente.
@@ -143,10 +143,9 @@ class Site:
 		"""
 		exploited_resource = 0.0
 		if numpy.random.rand() < self.predictability:
-			exploited_resource = min(self.resource, self.resource * agent_skill) # adicionei o "agent." no agent_skill).
+			exploited_resource = min(self.resource, self.resource * agent_skill)
 			self.resource -= exploited_resource
-			return exploited_resource
-
+		return exploited_resource
 
 	def clear_neighbor(self):
 		"""
@@ -166,12 +165,6 @@ class Site:
 		"""
 		self.neighbors.clear()
 		self.neighbors.append(self)
-
-
-
-
-
-
 
 class DebtLink:
 	"""
@@ -196,6 +189,19 @@ class DebtLink:
 		"""
 		self.lender = lender
 		self.borrower = borrower
+		self.value = value
+
+class GiftLink:
+	"""
+	"""
+	def __init__(self, 
+				 giver, 
+				 taker, 
+				 value):
+		"""
+		"""
+		self.giver = giver
+		self.taker = taker
 		self.value = value
 
 class Agent:
@@ -244,9 +250,10 @@ class Agent:
 		self.threshold_debt = threshold_debt
 		self.threshold_death = threshold_death
 		self.interest_rate = interest_rate
-		self.gift_gived = 0
-		self.debt = None
+		self.debt_link = None
 		self.loans = []
+		self.gift_link = None
+		self.gifts = []
 		 
 	def produce(self):
 		"""
@@ -307,7 +314,6 @@ class Agent:
 		quantidade de recursos no estoque do agente apos ele satisfazer
 		sua demanda diaria.
 		"""
-        
 		self.consumed = min(self.stock, self.consumption_demanded)
 		self.stock -= self.consumed
 		self.consumption_deficit += self.consumption_demanded - self.consumed
@@ -362,107 +368,8 @@ class Agent:
 			self._borrow()
 			self._migrate()
 		elif (self.consumption_deficit > 0.0): 
-			self._take()
 			self._migrate()
 		
-	def _take(self):
-		"""
-		a funcao "_take" pode fazer referencia apenas ao agente
-		que a chama, no caso um agent.
-        
-		eh nesta funcao que o agente vai de fato procurar por um
-		compartilhamento altruista. caso ele encontre com um agente
-		egoista, nao havera compartilhamento.
-        
-		primeiro: a funcao cria uma lista de escolhas que sera preenchida
-		pelos agentes, a, que estejam na vinzinhanca do sitio ocupado
-		pelo agente que chamou a funcao. a funcao vai verificar todos os
-		sitios na lista 'neighbors' do sitio em que o objeto se encontra
-		e vai varrer depois todos os agentes nas listas 'agents_in_site'
-		de todos os sitios encontrados.
-        
-		segundo: a funcai vai entao conferir se existe algum agente em
-		algum sitio vizinho ao sitio em que o objeto se encontra. se sim
-		a funcao executa o passo tres.
-        
-		terceiro:o agente escolhe de maneira aleatoria um de seus vizinhos.
-        
-		quarto: a funcao entao define que a dadiva sera igual ao valor que
-		retornar da funcao "_give" que eh chamada pelo agente escolhido no 
-		passo tres.
-        
-		cinco:o agente objeto consome entao o valor retornado da interacao
-		de compartilhamento egoista.
-        
-		seis: o deficit de consumo do agente objeto eh entao subtraido do
-		valor da dadiva recebida do altruista vizinho.
-        
-		resumo: o agente procura em sua vizinhanca por um agente qualquer e
-		caso tenha sucesso nesta procura pede ao mesmo que lhe de um pouco
-		de recurso para que ele satisfaca sua demanda diaria. se o agente 
-		vizinho vai lhe dar este recurso ou nao depende do proprio agente
-		que for procurado pelo objeto.
-		"""
-		choice_list = [a for s in self.site.neighbors for a in s.agents_in_site if a != self]
-		if len(choice_list) > 0:
-			choosed = numpy.random.choice(choice_list)
-			gift = choosed._give(self, self.consumption_demanded - self.consumed)
-			self.consumed += gift
-			self.consumption_deficit -= gift
-		
-	def _give(self, 
-			taker, 
-			asked_value):
-		"""
-		a funcao give pode fazer referencia ao agente
-		que a chama, seu objeto, e tambem ao agente
-		taker e ao valor solicitado pelo mesmo.
-	   
-		nesta funcao o agente procurado para doar os
-		seus recursos define se doa e o quanto doa.
-	   
-		primeiro: a funcao confere se a estrategia do agente
-		procurado eh altruista (0). se ela for, a funcao passa
-		entao para seu segundo passo. caso o agente procurado 
-		nao seja altruista a funcao úla para o passo de numero
-		seis e retorna o valor zero.
-	   
-		segundo: a funcao define que o valor da dadiva sera igual
-		ao minimo entre o estoque do agente altruista e o valor
-		pedido pelo agente que o procurou. Isto eh o mesmo que dizer
-		que se o agente altruista procurado nao tiver o valor total
-		solicitado por seu vizinho, ele ira doar ao mesmo tudo o que
-		tiver em seu estoque.
-	   
-		terceiro: o estoque do agente objeto eh subtraido entao do
-		valor que o mesmo pode doar ao agente vizinho.
-	   
-		quarto: a funcao soma um ao contador do agente altruista
-		em seu contador de dadivas dadas ateh o instante atual.
-	   
-		quinto: a funcao entao retorna o valor solicitado, a dadiva
-		ofertada pelo agente altruista.
-	   
-		sexto: caso o agente procurado tenha sido um agente egoista
-		a funcao nao retorna nenhum valor ao vizinho. isto porque 
-		foi definido inicialmente o limiar de divida do agente sendo
-		uma quantidade de deficit de consumo bastante grande, para simular
-		que um agente somente ira se sujeitar aa vontade de um egoista
-		caso realmente nao tenha encontrado outra solucao anteriormente.
-	   
-		resumo: esta funcao retorna o valor solicitado pelo agente que
-		tem um deficit de consumo inferior ao limiar de divida. mas,
-		que tem um deficit maior do que zero. o valor soh retornara caso
-		o agente tenha dado a "sorte" de escolher entre seus vizinhos
-		um vizinho altruista que tenha recursos em seu estoque.
-		"""
-		if self.strategy == 0:
-			gift = min(self.stock, asked_value)
-			self.stock -= gift
-			self.gift_gived += 1
-			return gift
-		else: return 0.0
-
 	def _migrate(self):
 		"""
 		a funcao migrate pode fazer referencia somente ao agente
@@ -537,7 +444,7 @@ class Agent:
 		setimo: o deficit de consumo do objeto eh subtraido do valor
 		trocado com o agente egoista.
 		"""
-		if self.debt == None:
+		if self.debt_link == None:
 			choice_list = [a for s in self.site.neighbors for a in s.agents_in_site if a.stock >= (self.consumption_demanded - self.consumed)]
 			if len(choice_list) > 0: 
 				choosed = numpy.random.choice(choice_list)
@@ -593,11 +500,34 @@ class Agent:
 		if self.strategy == 1:
 			loan_value = min(self.stock, asked_value)
 			self.stock -= loan_value
-			debt = DebtLink(self, borrower, loan_value)
-			self.loans.append(debt)
-			borrower.debt = debt
+			debt_link = DebtLink(self, borrower, loan_value * (1.0 + self.interest_rate))
+			self.loans.append(debt_link)
+			borrower.debt_link = debt_link
 			return loan_value
 		else: return 0.0
+
+	def _take(self,
+		   giver,
+		   offered_value):
+		"""
+		"""
+		self.consumed += offered_value
+		self.consumption_deficit -= offered_value
+		
+	def give(self):
+		"""
+		"""
+		if self.strategy == 0:
+			choice_list = [a for s in self.site.neighbors for a in s.agents_in_site if a != self and a.gift_link == None]
+			if len(choice_list) > 0:
+				choosed = numpy.random.choice(choice_list)
+				gift = min(self.stock, choosed.consumption_demanded - choosed.consumed)
+				if gift > 0:
+					self.stock -= gift
+					choosed._take(self, gift)
+					gift_link = GiftLink(self, choosed, gift)
+					self.gifts.append(gift_link)
+					choosed.gift_link = gift_link
 
 	def _die(self):
 		"""
@@ -637,13 +567,19 @@ class Agent:
 		"""
 		self.site.agents_in_site.remove(self)
 		self.site = None
-		if self.debt != None:
-			self.debt.lender.loans.remove(self.debt)
-			self.debt = None
-			for l, loan in enumerate(self.loans):
-				loan.borrower.debt = None
-				del self.loans[l]
-			self.agents_list.remove(self)
+		if self.debt_link != None:
+			self.debt_link.lender.loans.remove(self.debt_link)
+			self.debt_link = None
+		for l, loan in enumerate(self.loans):
+			loan.borrower.debt_link = None
+			del self.loans[l]
+		if self.gift_link != None:
+			self.gift_link.giver.gifts.remove(self.gift_link)
+			self.gift_link = None
+		for g, gift in enumerate(self.gifts):
+			gift.taker.gift_link = None
+			del self.gifts[g]
+		self.agents_list.remove(self)
 
 	def charge(self):
 		"""
@@ -680,10 +616,10 @@ class Agent:
 		todo o valor que devia.
 		"""
 		for l, loan in enumerate(self.loans):
-			payment_value = loan.borrower._pay(loan.value * (1.0 + self.interest_rate))
+			payment_value = loan.borrower._pay(loan.value)
 			loan.value -= payment_value
 			if loan.value <= 0.0:
-				loan.borrower.debt = None
+				loan.borrower.debt_link = None
 				del self.loans[l]
 			self.stock += payment_value
 
@@ -712,6 +648,18 @@ class Agent:
 		self.stock -= payment_value
 		return payment_value
 	
+	def retribute(self):
+		"""
+		"""
+		if self.gift_link != None:
+			retribution_value = min(self.stock, self.gift_link.value * (1.0 + self.interest_rate))
+			self.stock -= retribution_value
+			self.gift_link.value -= retribution_value
+			self.gift_link.giver.stock += retribution_value
+			if self.gift_link.value <= 0.0:
+				self.gift_link.giver.gifts.remove(self.gift_link)
+				self.gift_link = None
+
 	def sprout(self):
 		"""
 		a funcao "sprout" faz referencia somente ao agente objeto que a chamou.
@@ -765,7 +713,7 @@ class Agent:
 										sprout_threshold_death,
 										sprout_interest_rate))
 
-class Simulation():
+class Simulation:
 	"""
 	o ultimo objeto do codigo eh o 'Simulation'. eh aqui que sao
 	gerados todos os agentes, aqui tambem sao atribuidos todos os
@@ -1003,6 +951,12 @@ class Simulation():
 		for agent in self.agents_list:
 			agent.charge()
 		for agent in self.agents_list:
+			if agent.strategy == 0: 
+				agent.retribute()
+		for agent in self.agents_list:
+			if agent.strategy == 0: 
+				agent.give()
+		for agent in self.agents_list:
 			agent.consume()
 		for agent in self.agents_list:
 			agent.solve_consumption_deficit()
@@ -1010,7 +964,7 @@ class Simulation():
 			site.recovery()
 		for agent in self.agents_list:
 			agent.sprout()
-		
+	
 	def simulation(self, max_time):
 		"""
 		a funcao "simulation"  faz referencia aa "Simulation" e aa
@@ -1027,12 +981,17 @@ class Simulation():
 		"""
 		for t in range(max_time):
 			self.step()
-			#print(t, len(self.agents_list), sum([a.gift_gived for a in self.agents_list]), len([l for a in self.agents_list for l in a.loans ]))
-		self.save_data()
-	
-	def save_data(self):
-		"""
-		a funcao "save_data"...
-		"""
-		pass
-		pass
+			save_data_step(self, t);
+		save_data(self)
+
+
+def save_data_step(simulation, step):
+	pass
+	pass
+
+def save_data(simulation):
+	"""
+	a funcao "save_data"...
+	"""
+	pass
+	pass
