@@ -25,6 +25,9 @@
     <Content Include="figure_1.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="experiments.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="inequality_model.py" />
     <Compile Include="Pref_attachment.py" />
   </ItemGroup>
