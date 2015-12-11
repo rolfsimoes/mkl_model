@@ -1,0 +1,402 @@
+resource_mean = 0.0
+Simulacao = 0
+0
+Simulacao = 1
+0
+Simulacao = 2
+0
+Simulacao = 3
+0
+Simulacao = 4
+0
+Simulacao = 5
+0
+Simulacao = 6
+0
+Simulacao = 7
+0
+Simulacao = 8
+0
+Simulacao = 9
+0
+Simulacao = 10
+0
+Simulacao = 11
+0
+Simulacao = 12
+0
+Simulacao = 13
+0
+Simulacao = 14
+0
+Simulacao = 15
+0
+Simulacao = 16
+0
+Simulacao = 17
+0
+Simulacao = 18
+0
+Simulacao = 19
+0
+Simulacao = 20
+0
+Simulacao = 21
+0
+Simulacao = 22
+0
+Simulacao = 23
+0
+Simulacao = 24
+0
+Simulacao = 25
+0
+Simulacao = 26
+0
+Simulacao = 27
+0
+Simulacao = 28
+0
+Simulacao = 29
+0
+Simulacao = 30
+0
+Simulacao = 31
+0
+Simulacao = 32
+0
+Simulacao = 33
+0
+Simulacao = 34
+0
+Simulacao = 35
+0
+Simulacao = 36
+0
+Simulacao = 37
+0
+Simulacao = 38
+0
+Simulacao = 39
+0
+Simulacao = 40
+0
+Simulacao = 41
+0
+Simulacao = 42
+0
+Simulacao = 43
+0
+Simulacao = 44
+0
+Simulacao = 45
+0
+Simulacao = 46
+0
+Simulacao = 47
+0
+Simulacao = 48
+0
+Simulacao = 49
+0
+Simulacao = 50
+0
+Simulacao = 51
+0
+Simulacao = 52
+0
+Simulacao = 53
+0
+Simulacao = 54
+0
+Simulacao = 55
+0
+Simulacao = 56
+0
+Simulacao = 57
+0
+Simulacao = 58
+0
+Simulacao = 59
+0
+Simulacao = 60
+0
+Simulacao = 61
+0
+Simulacao = 62
+0
+Simulacao = 63
+0
+Simulacao = 64
+0
+Simulacao = 65
+0
+Simulacao = 66
+0
+Simulacao = 67
+0
+Simulacao = 68
+0
+Simulacao = 69
+0
+Simulacao = 70
+0
+Simulacao = 71
+0
+Simulacao = 72
+0
+Simulacao = 73
+0
+Simulacao = 74
+0
+Simulacao = 75
+0
+Simulacao = 76
+0
+Simulacao = 77
+0
+Simulacao = 78
+0
+Simulacao = 79
+0
+Simulacao = 80
+0
+Simulacao = 81
+0
+Simulacao = 82
+0
+Simulacao = 83
+0
+Simulacao = 84
+0
+Simulacao = 85
+0
+Simulacao = 86
+0
+Simulacao = 87
+0
+Simulacao = 88
+0
+Simulacao = 89
+0
+Simulacao = 90
+0
+Simulacao = 91
+0
+Simulacao = 92
+0
+Simulacao = 93
+0
+Simulacao = 94
+0
+Simulacao = 95
+0
+Simulacao = 96
+0
+Simulacao = 97
+0
+Simulacao = 98
+0
+Simulacao = 99
+0
+resource_mean = 0.1
+Simulacao = 0
+0
+Simulacao = 1
+0
+Simulacao = 2
+0
+Simulacao = 3
+0
+Simulacao = 4
+0
+Simulacao = 5
+0
+Simulacao = 6
+0
+Simulacao = 7
+0
+Simulacao = 8
+0
+Simulacao = 9
+0
+Simulacao = 10
+0
+Simulacao = 11
+0
+Simulacao = 12
+0
+Simulacao = 13
+0
+Simulacao = 14
+0
+Simulacao = 15
+0
+Simulacao = 16
+0
+Simulacao = 17
+0
+Simulacao = 18
+0
+Simulacao = 19
+0
+Simulacao = 20
+0
+Simulacao = 21
+0
+Simulacao = 22
+0
+Simulacao = 23
+0
+Simulacao = 24
+0
+Simulacao = 25
+0
+Simulacao = 26
+0
+Simulacao = 27
+0
+Simulacao = 28
+0
+Simulacao = 29
+0
+Simulacao = 30
+0
+Simulacao = 31
+0
+Simulacao = 32
+0
+Simulacao = 33
+0
+Simulacao = 34
+0
+Simulacao = 35
+0
+Simulacao = 36
+0
+Simulacao = 37
+0
+Simulacao = 38
+0
+Simulacao = 39
+0
+Simulacao = 40
+0
+Simulacao = 41
+0
+Simulacao = 42
+0
+Simulacao = 43
+0
+Simulacao = 44
+0
+Simulacao = 45
+0
+Simulacao = 46
+0
+Simulacao = 47
+0
+Simulacao = 48
+0
+Simulacao = 49
+0
+Simulacao = 50
+0
+Simulacao = 51
+0
+Simulacao = 52
+0
+Simulacao = 53
+0
+Simulacao = 54
+0
+Simulacao = 55
+0
+Simulacao = 56
+0
+Simulacao = 57
+0
+Simulacao = 58
+0
+Simulacao = 59
+0
+Simulacao = 60
+0
+Simulacao = 61
+0
+Simulacao = 62
+0
+Simulacao = 63
+0
+Simulacao = 64
+0
+Simulacao = 65
+0
+Simulacao = 66
+0
+Simulacao = 67
+0
+Simulacao = 68
+0
+Simulacao = 69
+0
+Simulacao = 70
+0
+Simulacao = 71
+0
+Simulacao = 72
+0
+Simulacao = 73
+0
+Simulacao = 74
+0
+Simulacao = 75
+0
+Simulacao = 76
+0
+Simulacao = 77
+0
+Simulacao = 78
+0
+Simulacao = 79
+0
+Simulacao = 80
+0
+Simulacao = 81
+0
+Simulacao = 82
+0
+Simulacao = 83
+0
+Simulacao = 84
+0
+Simulacao = 85
+0
+Simulacao = 86
+0
+Simulacao = 87
+0
+Simulacao = 88
+0
+Simulacao = 89
+0
+Simulacao = 90
+0
+Simulacao = 91
+0
+Simulacao = 92
+0
+Simulacao = 93
+0
+Simulacao = 94
+0
+Simulacao = 95
+0
+Simulacao = 96
+0
+Simulacao = 97
+0
+Simulacao = 98
+0
+Simulacao = 99
+0

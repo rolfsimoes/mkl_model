@@ -2,22 +2,26 @@
 
 
 def personal_data_step(simulation, step):
-	if step == 0:
-		print('%step', '%pop', '%debt', '%gift', '\n', sep='\t')
-	print(step, 
-		len(simulation.agents_list), 
-		len([l for a in simulation.agents_list for l in a.loans ]), 
-		len([g for a in simulation.agents_list for g in a.gifts ]), sep='\t')
+	pass
+	#if step == 0:
+		#print('%step', '%pop', '%debt', '%gift', '\n', sep='\t')
+	#print(step,
+		#len(simulation.agents_list),
+		#len([l for a in simulation.agents_list for l in a.loans ]),
+		#len([g for a in simulation.agents_list for g in a.gifts ]), sep='\t')
 
 def personal_data(simulation):
-	print('%edge list of lend-borrower relation')
-	for a in simulation.agents_list:
-		for n in a.loans:
-			print(id(a), id(n), sep=',')
-	print('%edge list of giver-taker relation')
-	for a in simulation.agents_list:
-		for n in a.gifts:
-			print(id(a), id(n), sep=',')
+
+	print(len(simulation.agents_list))
+
+	#print('%edge list of lend-borrower relation')
+	#for a in simulation.agents_list:
+		#for n in a.loans:
+			#print(id(a), id(n), sep=',')
+	#print('%edge list of giver-taker relation')
+	#for a in simulation.agents_list:
+		#for n in a.gifts:
+			#print(id(a), id(n), sep=',')
 
 im.save_data_step = personal_data_step
 im.save_data = personal_data
@@ -25,14 +29,19 @@ im.save_data = personal_data
 """
 o range do i eh a variacao do valor dos parametros i que eu vou testar
 """
-for i in range(1):
+
+
+
+for i in range(0, 2):
+	k = i/10.0
+	print("resource_mean =", k)
 	"""
 	a variavel "sim" define os valores iniciais de sites_count, agents_count
 	e todas as variaveis 'mean' e 'sigma' das funcoes de sorteio de valores
 	das propriedades dos sites e dos agents.
 	"""
 	sim = im.Simulation(sites_count=1024, 
-			 sites_init_resource_mean = 4.0,
+			 sites_init_resource_mean = k,
 			 sites_init_resource_sigma = 0.1,
 			 sites_recovery_rate_mean = 1.1,
 			 sites_recovery_rate_sigma = 0.1,
@@ -62,9 +71,9 @@ for i in range(1):
 	eh aqui que de fato comeca a simulacao, por isso no parenteses eh colocado
 	o valor referente ao 'max_time'.
 	"""
-	for j in range(1):
+	for j in range(100):
+		print("Simulacao =", j)
 		"""
 		o range aqui eh o numero de vezes que a simulacao vai realizar cada i dos parametros.
 		"""
-		print("#simulation:", j)
-		sim.simulation(2000)
+		sim.simulation(2000,)
