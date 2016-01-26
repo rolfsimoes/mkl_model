@@ -965,7 +965,7 @@ class Simulation:
 		for agent in self.agents_list:
 			agent.sprout()
 	
-	def simulation(self, max_time, realizations = 1):
+	def simulation(self, max_time, parameter = None, realization = 1):
 		"""
 		a funcao "simulation"  faz referencia aa "Simulation" e aa
 		propriedade max_time. esta eh a funcao que chama os steps
@@ -979,30 +979,19 @@ class Simulation:
         
 		terceiro: o objeto chama a funcao "save_data".
 		"""
-		save_data_begin(self)
-		for i in range(realizations):
-			for t in range(max_time):
-				self.step()
-				save_data_step(self, t)
-			save_data_realization(self, i)
-		save_data_end(self)
+		for t in range(max_time):
+			self.step()
+			save_data_step(self, parameter=parameter, realization=realization, step=t)
+		save_data_realization(self, parameter=parameter, realization=realization)
 
 
-def save_data_begin(simulation):
+def save_data_step(simulation, parameter, realization, step):
 	pass
 	pass
 
-def save_data_step(simulation, step):
-	pass
-	pass
-
-def save_data_realization(simulation, realization):
+def save_data_realization(simulation, parameter, realization):
 	"""
 	a funcao "save_data"...
 	"""
-	pass
-	pass
-
-def save_data_end(simulation):
 	pass
 	pass
